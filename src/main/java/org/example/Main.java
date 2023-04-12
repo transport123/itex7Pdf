@@ -9,13 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.font.FontProvider;
 import freemarker.template.*;
+import org.example.freemark.FMHelper;
+import org.example.freemark.FMInstance;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -37,8 +37,27 @@ public class Main {
     public static final String ftls = "src/main/resources/ftls/";
 
 
-    public static void main(String[] args) throws TemplateException, IOException {
-        ftlToHtml();
+    public static void main(String[] args) throws IOException {
+        Map<String, Object> root = new HashMap<>();
+        root.put("first", "firstseason");
+        root.put("second","2季度!");
+        root.put("firstvalue",15);
+        root.put("secondvalue",20);
+        List<String> names = new ArrayList<>();
+        List<InputStream> streams = new ArrayList<>();
+        InputStream excelStream = FMHelper.generateInputStream("Workbook2.xml", root);//excel流
+        InputStream chartStream = FMHelper.generateInputStream("chart1.xml", root);//chart流
+        String chart1Name="word/charts/chart1.xml";
+        String workName  = "word/embeddings/Workbook2.xlsx";
+        names.add(chart1Name);
+        names.add(workName);
+        streams.add(chartStream);
+        streams.add(excelStream);
+        ZipHelper.replaceItem(names,streams);
+//        excelStream.close();
+//        chartStream.close();
+
+
     }
 
     public static ConverterProperties createProperties() {
@@ -140,4 +159,77 @@ public class Main {
         HtmlConverter.convertToPdf(rawHtml, new FileOutputStream(dest), createProperties());
 //        PdfWriter pdfWriter = new PdfWriter("");
     }
+
+
+//        public static Map<String,Object> Xml2Docx(File outFile, Map<String,Object> dataMap, String document, String documentXmlRels, String originalTemplate){
+//            Map<String,Object> retMap = new HashMap<>();
+//            retMap.put("succ",true);
+//            ZipOutputStream zipout = null;
+//            OutputStream outputStream = FileUtil.getOutputStream(outFile);
+//            try {
+//                //图片配置文件模板
+//                ByteArrayInputStream documentXmlRelsInput = FreeMarkUtils.getFreemarkerContentInputStream(dataMap, documentXmlRels);
+//                //内容模板
+//                ByteArrayInputStream documentInput = FreeMarkUtils.getFreemarkerContentInputStream(dataMap, document);
+//                ZipFile zipFile = new ZipFile(originalTemplate);
+//                Enumeration<? extends ZipEntry> zipEntrys = zipFile.entries();
+//                zipout = new ZipOutputStream(outputStream);
+//                //开始覆盖文档------------------
+//                int len = -1;
+//                byte[] buffer = new byte[1024];
+//                while (zipEntrys.hasMoreElements()) {
+//                    ZipEntry next = zipEntrys.nextElement();
+//                    InputStream is = zipFile.getInputStream(next);
+//                    if (next.toString().indexOf("media") < 0) {
+//                        zipout.putNextEntry(new ZipEntry(next.getName()));
+//                        if (next.getName().indexOf("document.xml.rels") > 0) { //如果是document.xml.rels由我们输入
+//                            if (documentXmlRelsInput != null) {
+//                                while ((len = documentXmlRelsInput.read(buffer)) != -1) {
+//                                    zipout.write(buffer, 0, len);
+//                                }
+//                                documentXmlRelsInput.close();
+//                            }
+//                        } else if ("word/document.xml".equals(next.getName())) {//如果是word/document.xml由我们输入
+//                            if (documentInput != null) {
+//                                while ((len = documentInput.read(buffer)) != -1) {
+//                                    zipout.write(buffer, 0, len);
+//                                }
+//                                documentInput.close();
+//                            }
+//                        } else {
+//                            while ((len = is.read(buffer)) != -1) {
+//                                zipout.write(buffer, 0, len);
+//                            }
+//                            is.close();
+//                        }
+//                    }
+//                }
+//            } catch (Exception e) {
+//                e.getStackTrace();
+//                retMap.put("succ",false);
+//                retMap.put("msg",e.getMessage());
+//            }
+//            finally {
+//                if(zipout!=null){
+//                    try {
+//                        zipout.close();
+//                    } catch (IOException e) {
+//                        e.getStackTrace();
+//                        retMap.put("succ",false);
+//                        retMap.put("msg",e.getMessage());
+//                    }
+//                }
+//                if(outputStream!=null){
+//                    try {
+//                        outputStream.close();
+//                    } catch (IOException e) {
+//                        e.getStackTrace();
+//                        retMap.put("succ",false);
+//                        retMap.put("msg",e.getMessage());
+//                    }
+//                }
+//            }
+//            return retMap;
+//        }
+//    }
 }
