@@ -37,7 +37,17 @@ public class Main {
     public static final String ftls = "src/main/resources/ftls/";
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)  {
+
+        try {
+            EncodeProblem.generateFileWithCharStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static void testGenerateDocx()throws IOException{
         Map<String, Object> root = new HashMap<>();
         root.put("first", "firstseason");
         root.put("second","2季度!");
@@ -54,10 +64,6 @@ public class Main {
         streams.add(chartStream);
         streams.add(excelStream);
         ZipHelper.replaceItem(names,streams);
-//        excelStream.close();
-//        chartStream.close();
-
-
     }
 
     public static ConverterProperties createProperties() {

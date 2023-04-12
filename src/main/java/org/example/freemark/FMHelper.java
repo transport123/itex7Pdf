@@ -6,6 +6,7 @@ import freemarker.template.TemplateException;
 
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class FMHelper {
         Template tplt;
         //创建output流
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(16*1024);
+        System.out.println(Charset.defaultCharset());
         Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
         try {
             //将数据bean转换为map
