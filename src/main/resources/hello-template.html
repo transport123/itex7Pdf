@@ -71,7 +71,7 @@
             xAxis: {
                 axisLabel: {
                     fontSize: '1rem',
-
+                    align:'right'
                 },
                 data: ["hello","sweater","heels","pants","hhhhh","socks"]
             },
@@ -92,8 +92,19 @@
         myChart.setOption(option)
         document.write(myChart.renderToSVGString())
         // document.getElementById("preview").src=canvas.toDataURL()
-
-
+        let svg = document.querySelector('svg')
+  
+        let texts = svg.querySelectorAll('text')
+        console.log(texts)
+        let text = texts[8]
+        console.log(text.getAttribute('transform'))
+        console.log(text.textContent)
+        let str = text.textContent
+        let length = str.length
+        console.log(length)
+        let halfWidth = length*8
+        text.setAttribute('transform','translate(473.3333 438)')
+        //https://segmentfault.com/q/1010000009791785
     </script>
 
 </div>
