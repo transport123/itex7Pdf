@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script type="text/javascript" src="echarts.min.js" charset="UTF-8"></script>
     <style >
         @font-face {
-            font-family: "cst";
+            font-family: "simsunbdttf";
             src: url("./simsunbd/simsunbd.ttf");
         }
 
@@ -19,34 +20,45 @@
 <div id="main" style="width:600px;height: 400px;" >
 
 </div>
-    <script type="text/javascript" src="echarts.min.js" charset="UTF-8"></script>
 
 
-<div id="tail" style="width:600px;height: 400px;" >
+<div id="tail"  >
 你好aa
-    <img id="preview" src="">
+    <img id="preview"  style="width: 500px;height: 500px">
     <script type="text/javascript" charset="UTF-8">
+
+
+        var initialised = false;
+        window.addEventListener("load", function() {
+            var newElement = document.createElement("p");
+            newElement.textContent = "Hello from JavaScript!";
+            document.body.appendChild(newElement);
+            initialised = true;
+        });
         // 基于准备好的dom，初始化echarts实例
-        // var myChart = echarts.init(null,null,{
-        //     renderer:'svg',
-        //     width: 500,
-        //     height: 300,
-        //     ssr: true
-        // });
+        var myChart = echarts.init(null,null,{
+            renderer:'svg',
+            width: 800,
+            height: 500,
+            ssr: true
+        });
 
         // echarts.setCanvasCreator(() => {
         //     return createCanvas();
         // });
 
-        const canvas = document.createElement('canvas');
-        canvas.width = 500;
-        canvas.height = 400;
+        // const canvas = document.createElement('canvas');
+        // canvas.width = 1200;
+        // canvas.height = 1200;
 
 
-        const myChart = echarts.init(canvas);
+        // const myChart = echarts.init(canvas);
 
         // 指定图表的配置项和数据
         var option = {
+            textStyle:{
+                fontFamily:"",
+            },
             animation:false,
             // fontFamily:"./simsunbd/simsunbd.ttf",
             title: {
@@ -58,12 +70,17 @@
             },
             xAxis: {
                 axisLabel: {
-                    fontSize: 10,
-                    //fontFamily:"./simsunbd/simsunbd.ttf",
+                    fontSize: '1rem',
+
                 },
-                data: ["你好","sweater","heels","pants","hhhhh","socks"]
+                data: ["hello","sweater","heels","pants","hhhhh","socks"]
             },
-            yAxis: {},
+            yAxis: {
+                axisLabel: {
+                    fontSize: '1rem',
+                    //fontFamily:"./simsunbd/simsunbd.ttf",
+                }
+            },
             series: [{
                 name: 'sales',
                 type: 'bar',
@@ -73,8 +90,10 @@
 
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option)
-        // document.write(myChart.renderToSVGString())
-        document.getElementById("preview").src=canvas.toDataURL()
+        document.write(myChart.renderToSVGString())
+        // document.getElementById("preview").src=canvas.toDataURL()
+
+
     </script>
 
 </div>

@@ -6,7 +6,6 @@ import freemarker.template.TemplateExceptionHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class FMInstance {
     private final Configuration fmConfig;
@@ -31,12 +30,10 @@ public class FMInstance {
 
 
         // Where do we load the templates from:
-//        cfg.setClassForTemplateLoading(MainTest.class, "templates");
 
         // Some other recommended settings:
         fmConfig.setDefaultEncoding("UTF-8");
         fmConfig.setDirectoryForTemplateLoading(new File(ftls));
-//        cfg.setLocale(Locale.CHINESE);
         fmConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
     }
 
