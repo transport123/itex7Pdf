@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html languages="zh">
+
+<head>
+    <meta charset="utf-8" />
+    <title>
+        文件选择与blob
+    </title>
+    <script>
+        function openBlob(blob) {
+            let objURL = URL.createObjectURL(blob)
+            window.open(objURL)
+            //location.href=objURL
+            URL.revokeObjectURL(objURL)
+        }
+
+        function filePicked(filelist) {
+            //注意绑定的是change事件，重复选同一个文件是不会触发的
+            //直接使用data会乱码，需要创建新的blob并指定对应的编码方式
+            const textPlainReg = /^text\/plain/
+            const fileBlob = filelist[0]
+            if (textPlainReg.test(fileBlob.type)) {
+                fileBlob.text().then((text) => {
+                    //需要给blob添加一个编码头，使得blob在解析时使用对应的编码
+                    //流本身的格式是没问题的，但是浏览器在解析流时不知道采取什么编码解析，就采用默认的方式（不知道是什么，不过看起来并不是utf-8）
+                    //当其用错误的解码方式去转换中文字符时得到的必然与原内容不相符
+                    //我的理解：plain text浏览器需要创建一串 字符document流<html>data</html>,其中data也是字符串，而我们的输入是blob，那么首先就是
+                    //把blob转换为字符串，所以这个转换过程必须使用正确的编码格式
+                    const utfBlob = new Blob(["\ufeff", text], { type: fileBlob.type })
+                    openBlob(utfBlob)
+                })
+            } else {
+                openBlob(fileBlob)
+            }
+
+            //     const sliceBlob = fileBlob.slice(0,fileBlob.size,"text/plain,charset=UTF-8")
+            //    // let objURL = URL.createObjectURL(sliceBlob)
+            //     console.log(objURL)
+            //     window.open(objURL)
+            //     //location.href=objURL
+            //     URL.revokeObjectURL(objURL)
+            document.getElementById("pseudopick").value = ""//事件触发完成后清空value值，保证下次无论怎么选取都会触发
+        }
+    </script>
+</head>
+
+<body>
+    <div>
+        <!--使用其他样式代替默认的input file-->
+        <input type="file" id="pseudopick" onchange="filePicked(this.files)" style="display: none;">
+        <a href="#" id="filepick">选择文件</a>
+        <div id="dragBox"
+            style="width: 300px;height: 300px;border: 1px solid black;display: flex;align-items: center;justify-content: center;">
+            <span>拖放图片以预览</span>
+        </div>
+
+    </div>
+
+    <script>
+        window.URL = window.URL || window.webkitURL;
+        let pseudoPick = document.getElementById("pseudopick")
+        let filePick = document.getElementById("filepick")
+        filePick.addEventListener("click", (e) => {
+            if (pseudoPick) pseudoPick.click()
+            e.preventDefault()
+        }, false)
+        let box = document.getElementById('dragBox')
+        box.addEventListener("dragenter", (e) => {
+            e.stopPropagation()
+            e.preventDefault()
+        }, false)
+        box.addEventListener("dragover", (e) => {
+            e.stopPropagation()
+            e.preventDefault()
+        }, false)
+        box.addEventListener("drop", (e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            const files = e.dataTransfer.files
+            previewPicture(files)
+        }, false)
+
+
+        function previewPicture(files) {
+            console.log(files)
+            if (!files) return
+            //匹配image/的reg 注意/要使用转义
+            let imgReg = /^image\//
+            for (let blobPic of files) {
+                if (!imgReg.test(blobPic.type)) continue
+                const picUrl = window.URL.createObjectURL(blobPic)
+                let imgEl = document.createElement("img")
+                imgEl.setAttribute("style", "width:200px;height:200px")
+                box.appendChild(imgEl)
+                imgEl.src = picUrl
+                //此时不可以revoke 图片加载这个过程是异步的 不能在加载之前就销毁objurl
+                //通过settimeout将其作为宏任务加到队列末尾，保证其在imgload之后才执行
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(picUrl)
+                }, 0)
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>
