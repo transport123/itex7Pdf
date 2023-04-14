@@ -1,112 +1,204 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <script type="text/javascript" src="echarts.min.js" charset="UTF-8"></script>
-    <style >
+    <style>
         @font-face {
             font-family: "simsunbdttf";
             src: url("./simsunbd/simsunbd.ttf");
         }
 
-        body {  }
+        body {}
     </style>
 
 </head>
+
 <body>
 
 
-<div id="main" style="width:600px;height: 400px;" >
+    <div id="main" style="width:600px;height: 400px;">
 
-</div>
-
-
-<div id="tail"  >
-你好aa
-    <img id="preview"  style="width: 500px;height: 500px">
-    <script type="text/javascript" charset="UTF-8">
+    </div>
 
 
-        var initialised = false;
-        window.addEventListener("load", function() {
-            var newElement = document.createElement("p");
-            newElement.textContent = "Hello from JavaScript!";
-            document.body.appendChild(newElement);
-            initialised = true;
-        });
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(null,null,{
-            renderer:'svg',
-            width: 800,
-            height: 500,
-            ssr: true
-        });
-
-        // echarts.setCanvasCreator(() => {
-        //     return createCanvas();
-        // });
-
-        // const canvas = document.createElement('canvas');
-        // canvas.width = 1200;
-        // canvas.height = 1200;
+    <div id="tail">
+        你好aa
+        <img id="preview" style="width: 500px;height: 500px">
+        <script type="text/javascript" charset="UTF-8">
 
 
-        // const myChart = echarts.init(canvas);
+            let initialised = false;
+            window.addEventListener("load", function () {
+                let newElement = document.createElement("p");
+                newElement.textContent = "Hello from JavaScript!";
+                document.body.appendChild(newElement);
+                initialised = true;
+            });
+            // 基于准备好的dom，初始化echarts实例
+            let myChart = echarts.init(null, null, {
+                renderer: 'svg',
+                width: 800,
+                height: 500,
+                ssr: true
+            });
 
-        // 指定图表的配置项和数据
-        var option = {
-            textStyle:{
-                fontFamily:"",
-            },
-            animation:false,
-            // fontFamily:"./simsunbd/simsunbd.ttf",
-            title: {
-                text: 'echarts'
-            },
-            tooltip: {},
-            legend: {
-                data:['sales']
-            },
-            xAxis: {
-                axisLabel: {
-                    fontSize: '1rem',
-                    align:'right'
+            // echarts.setCanvasCreator(() => {
+            //     return createCanvas();
+            // });
+
+            // const canvas = document.createElement('canvas');
+            // canvas.width = 1200;
+            // canvas.height = 1200;
+
+
+            // const myChart = echarts.init(canvas);
+
+            // 指定图表的配置项和数据
+            let option = {
+                textStyle: {
+                    fontFamily: "",
                 },
-                data: ["hello","sweater","heels","pants","hhhhh","socks"]
-            },
-            yAxis: {
-                axisLabel: {
-                    fontSize: '1rem',
-                    //fontFamily:"./simsunbd/simsunbd.ttf",
+                animation: false,
+                // fontFamily:"./simsunbd/simsunbd.ttf",
+                title: {
+                    text: 'echarts'
+                },
+                tooltip: {},
+                legend: {
+                    data: ['sales']
+                },
+                xAxis: {
+                    axisLabel: {
+                        fontSize: '1rem',
+                        align: 'left'
+                    },
+                    //将需要二次更改的text标签打上标记::,以便query时可以判断是否需要更改
+                    data: ["::你好", "::sweater", "::heels", "::pants", "::hhhhh", "::socks"]
+                },
+                yAxis: {
+                    axisLabel: {
+                        fontSize: '1rem',
+                        //fontFamily:"./simsunbd/simsunbd.ttf",
+                    }
+                },
+                series: [{
+                    name: 'sales',
+                    type: 'bar',
+                    data: [5, 20, 36, 10, 10, 20]
+                }]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option)
+            document.write(myChart.renderToSVGString())
+            // document.getElementById("preview").src=canvas.toDataURL()
+
+
+            let labels = option.textStyle.data
+
+            //获取svg元素
+            let svg = document.querySelector('svg')
+
+            //获取所有text标签
+            let texts = svg.querySelectorAll('text')
+            console.log(texts)
+
+            for(let index = 0;index<texts.length;index++)
+            {
+                if(!texts[index].textContent.startsWith('::'))  continue
+                let rawTag = extractRawString(texts[index].textContent)
+                let {enCount,chCount}=calculateCharCount(rawTag)
+                let style = texts[index].getAttribute('style')
+                let fontsize= extractStyleToFontSize(style)
+                let offset= calculatePxFontSize(fontsize)*(enCount/2+chCount)/2
+                let translate = translateOffset(texts[index].getAttribute('transform'),offset)
+                texts[index].setAttribute('transform',translate)
+                texts[index].textContent=rawTag
+            }
+           
+         
+
+            //https://segmentfault.com/q/1010000009791785
+
+
+
+
+            function extractRawString(tag) {
+                console.log(tag)
+                if (checkStrValid(tag) && tag.startsWith('::')) {
+                    return tag.slice(2)
+                } else {
+                    return "default"
                 }
-            },
-            series: [{
-                name: 'sales',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }]
-        };
+            }
 
-        // 使用刚指定的配置项和数据显示图表。
-        myChart.setOption(option)
-        document.write(myChart.renderToSVGString())
-        // document.getElementById("preview").src=canvas.toDataURL()
-        let svg = document.querySelector('svg')
-  
-        let texts = svg.querySelectorAll('text')
-        console.log(texts)
-        let text = texts[8]
-        console.log(text.getAttribute('transform'))
-        console.log(text.textContent)
-        let str = text.textContent
-        let length = str.length
-        console.log(length)
-        let halfWidth = length*8
-        text.setAttribute('transform','translate(473.3333 438)')
-        //https://segmentfault.com/q/1010000009791785
-    </script>
+            function translateOffset(translate, offset) {
+                if (checkStrValid(translate) && translate.startsWith('translate')) {
+                    let xy = translate.slice(9).split(' ')//获取(x y)-->(x与y)  
+                    let x = Number.parseFloat(xy[0].slice(1))
+                    let y = Number.parseFloat(xy[1].slice(0, -1))
+                    console.log(offset)
+                    x -= offset
+                    return `translate(${x} ${y})`
 
-</div>
+                } else {
+                    return 'translate(0 0)'
+                }
+            }
+
+            //在计算中英文字符数时遇到了麻烦，因为charAt返回的是码点数，对于定长编码会较好处理。但是bmp字符集需要两个码点表示，
+            //所以对于这种情况需要分开判断hign和low的码点值。假如不考虑bmp字符集，中英文数字等字符数计算可以认为是定长编码，只需要
+            //判断单个charcode的范围即可。
+            //使用正则表达式似乎不用考虑上述问题，正则的匹配是一个黑盒，默认会处理这些情况
+            //因为正则的匹配规则本身就是字符匹配，用户不用关心字节流
+            function calculateCharCount(rawtag) {
+                let enCount = 0
+                let chCount = 0
+                //正则exec必须带上g去寻找下一个匹配点
+                //由于此时寻找的是单个字符，所以使用单项，不要加*或者+
+                //简化方案，使用正则+ascii的方式去寻找非ascii集的字符 不能完全满足需求
+               let xReg=/[\x00-\xff]/g
+                while(xReg.exec(rawtag))
+                {
+                    enCount++
+                }
+                chCount=rawtag.length-enCount
+                //暂时忽略bmp,如果想完整的统计只能通过charCode一个个计算
+                return { enCount, chCount }
+
+            }
+
+            function extractStyleToFontSize(style)
+            {
+                if(!checkStrValid(style))
+                    return '0px'
+                return style.split('font-size:')[1].split(';')[0]
+            }
+
+            function calculatePxFontSize(fontSize)
+            {
+                if(!checkStrValid(fontSize))
+                    return 0
+                let size = Number.parseFloat(fontSize)
+                if(fontSize.endsWith('px'))
+                    return size
+                if(fontSize.endsWith('rem'))
+                    return size*16//一般浏览器默认fontsize为16 
+                    //也可以通过
+                    //getComputedStyle(document.getElementsByTagName('div')[0],undefined).fontsize
+                return size    
+            }
+
+            function checkStrValid(src) {
+                console.log(typeof src)
+                return (src && typeof src === 'string')
+            }
+        </script>
+
+    </div>
 </body>
+
 </html>
