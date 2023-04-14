@@ -56,7 +56,19 @@ driver->driver.excuteScript("return document.readystade").equals("complete")
 
 总结来说不推荐该方案，不论是生成html的性能损耗，以及最终html to pdf的对齐问题都有些棘手，需要重新考虑方向。
 
-#### 扩展：blob url
+##### update
+
+text-anchor的对齐问题最终通过JS遍历text节点，并计算label宽度进行偏移达到人工的居中
+
+不过该方式尚存在一些问题，比如不同的模板，图表可能都需要手动引入并配置，其抽象程度还不够。并且遍历text节点，字符串的解析也是比较耗时的，性能上也不够优秀，不太确定其对性能造成的多余损耗。
+
+且JS中通过字符的charCode判断单个字符占位宽度是稍微有些麻烦的，因为必须考虑到BMP字符集，无论是正则的方式，还是通过遍历charcode进行判断都要兼顾每种类型的字符。
+
+排除上述问题这个方案确实是实现了我的需求，只不过逐渐认识到，对于这种需求JS运行环境的SSR方案，放在JAVA服务器中是一件相当别扭的方法，更合理的方式是在client与业务server中间，再架设一个node的服务器（如express等），ssr+模板全部通过nodejs的生态去解决；由于前后端分离，很多时候并不需要这个中间层，此时再通过nginx配合使用。nginx的优势在于负载均衡+静态资源处理+性能，
+
+nginx反向代理到node.js有什么优势
+
+#### blob url
 
 
 
